@@ -72,7 +72,7 @@ pipeline {
                                 mkdir -p $DOCKER_CONFIG
                                 echo $DOCKER_TOKEN | docker login -u anki15201 --password-stdin
                                 
-                                docker buildx build --platform linux/amd64\
+                                docker build --platform linux/amd64\
                                     -t ${DOCKER_IMAGE}:${IMAGE_TAG} \
                                     -t ${DOCKER_IMAGE}:latest \
                                     --load .
@@ -81,8 +81,9 @@ pipeline {
                             '''
                         }
                     } catch (err) {
+                        echo "ERROR DETAILS: ${err}"
                         writeFile file: "${ERROR_FILE}", text: "Build stage failed:\n${err}"
-                        error("Build stage failed")
+                        throw err   // 🔥 instead of error()
                     }
                 }
             }
